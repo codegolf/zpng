@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<script src="zopfli.zlib.min.js"></script>
+	<script src="crc.js"></script>
+	<script src="main.js"></script>
+	<script>
+	var binascii = makePNGStub([0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF], {
+		// iterations: Number, default: 15. Compression quality
+		// filter: 'none' | 'sub' | 'up' | 'average' | 'paeth'
+	});
+	var dataUrl = 'data:image/png;base64,' + btoa(binascii + '<hr>');
+
+	var image = new Image();
+	image.src = dataUrl;
+	document.body.appendChild(image);
+
+	var link = document.body.appendChild(document.createElement('a'));
+	link.download = 'generated.png';
+	link.href = dataUrl;
+	link.textContent = 'Download';
+	</script>
+</body>
+</html>
