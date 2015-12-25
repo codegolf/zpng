@@ -50,6 +50,7 @@
     for(i in a.value){
       arr.push(a.value.charCodeAt(i));
     }
+    arr.push(0x00);
     
     var binascii = makePNGStub(arr, {
       // iterations: Number, default: 15. Compression quality
