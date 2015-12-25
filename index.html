@@ -1,27 +1,66 @@
-<!DOCTYPE html>
+<!doctype html>
+<meta charset=utf-8>
+<a href=//github.com/codegolf/zpng><img style="position:absolute;top:0;right:0;border:0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
 <html>
 <head>
-	<title></title>
+	<title>zpng</title>
 </head>
 <body>
+  <style>
+    body { width: 500px; padding: 10px 0; margin: 0 auto; font-family: arial; text-align: center; }
+    textarea { width: 500px; height: 300px }
+    i { font-size: 10px }
+  </style>
+  <h1>zpng</h1>
+  <h3>A pure JS <a href="http://creativejs.com/2012/06/jsexe-javascript-compressor/">JsExe</a> clone</h3>
+  <br>
+  <b>Input (JS, ASCII)</b>
+  <br>
+  <br>
+  <textarea id=a></textarea>
+  <br>
+  <br>
+  <b>PNG preview</b>
+  <br>
+  <img id=b>
+  <br>
+  <br>
+  <a href=# id=c download="js.png.html">Download HTML file with PNG bootstrap</a>
+  <br>
+  <br>
+  <br>
+  <br>
+  2015 - the codegolf team
+  <br>
+  <br>
+  <br>
+  <i>PS: Your JS code can use the shortcuts created by zpng:
+  <br>
+  e (eval), V (a canvas), C (canvas context2d), X (canvas imageData), $ and _ (strings)</i>
+  <br>
+  <br>
 	<script src="zopfli.zlib.min.js"></script>
 	<script src="crc.js"></script>
 	<script src="main.js"></script>
 	<script>
-	var binascii = makePNGStub([0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF], {
-		// iterations: Number, default: 15. Compression quality
-		// filter: 'none' | 'sub' | 'up' | 'average' | 'paeth'
-	});
-	var dataUrl = 'data:image/png;base64,' + btoa(binascii + '<hr>');
+	a.oninput = function(){
+    
+    var i;
+    var arr = [];
+    for(i in a.value){
+      arr.push(a.value.charCodeAt(i));
+    }
+    
+    var binascii = makePNGStub(arr, {
+      // iterations: Number, default: 15. Compression quality
+      // filter: 'none' | 'sub' | 'up' | 'average' | 'paeth'
+    });
+    var dataUrl = 'data:image/png;base64,' + btoa(binascii + "<canvas id=V><img src=# onload=C=V.getContext('2d');for($=_='';C.drawImage(this,$--,0),X=(q=C.getImageData(0,0,64,32)).data[0];_+=String.fromCharCode(X));(e=eval)(_)");
 
-	var image = new Image();
-	image.src = dataUrl;
-	document.body.appendChild(image);
+    b.src = dataUrl;
 
-	var link = document.body.appendChild(document.createElement('a'));
-	link.download = 'generated.png';
-	link.href = dataUrl;
-	link.textContent = 'Download';
+    c.href = dataUrl;
+  }
 	</script>
 </body>
 </html>
