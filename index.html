@@ -87,7 +87,13 @@
     
     info.innerHTML += " input: " + a.value.length + "b; output: " + (binascii.length + boot.length) + "b)";
     
-    var dataUrl = 'data:text/html;base64,' + btoa(binascii + boot);
+    // If the PNG contains an unmatched opening tag ("<"), close it
+    var tagend = "";
+    if(binascii.match(/<[^<]*$/)) {
+      tagend = ">";
+    }
+    
+    var dataUrl = 'data:text/html;base64,' + btoa(binascii + tagend + boot);
 
     b.src = dataUrl;
 
