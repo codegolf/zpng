@@ -7,44 +7,64 @@
 </head>
 <body>
   <style>
+    * { margin: 0; padding: 0 }
     body { width: 500px; padding: 10px 0; margin: 0 auto; font-family: arial; text-align: center; }
-    textarea { width: 500px; height: 300px }
+    h1 { font-size: 50px; line-height: 60px }
+    h2 { font-size: 25px; line-height: 30px }
+    h3 { font-size: 20px; line-height: 25px; }
+    textarea { width: 500px; height: 200px }
+    input { width: 50px }
     i { font-size: 10px }
   </style>
   <h1>zpng</h1>
-  <h3>A pure JS <a href="http://creativejs.com/2012/06/jsexe-javascript-compressor/">JsExe</a> clone</h3>
   <br>
-  <b>Input (JS, ASCII)</b>
+  <b>A pure JS <a href="http://creativejs.com/2012/06/jsexe-javascript-compressor/">JsExe</a> clone</b>
   <br>
+  <br>
+  <br>
+  <h3>Input (JS, ASCII)</h3>
   <br>
   <textarea id=a></textarea>
   <br>
   <br>
-  <b>PNG preview</b>
+  <b>Iterations</b> <input type=number id=it value=50>
+  <br>
+  <br>
+  <button id=compile>Compile</button>
+  <br>
+  <br>
+  <br>
+  <br>
+  <h3>Output</h3>
+  <br>
+  <br>
+  <b><a id=c download="js.png.html"></a></b>
+  <br>
   <br>
   <img id=b>
   <br>
   <br>
-  <a href=# id=c download="js.png.html">Download HTML file with PNG bootstrap</a>
+  <span id=info></span>
   <br>
   <br>
   <br>
   <br>
-  2015 - the codegolf team
   <br>
-  <br>
-  <br>
-  <i>PS: Your JS code can use the shortcuts created by zpng:
+  <i>PS: Your JS code can reuse these shortcuts:
   <br>
   e (eval), V (a canvas), C (canvas context2d), X (canvas imageData), $ and _ (strings)</i>
   <br>
+  <br>
+  <br>
+  2015 - the codegolf team <3
   <br>
 	<script src="zopfli.zlib.min.js"></script>
 	<script src="crc.js"></script>
 	<script src="main.js"></script>
 	<script>
-	a.oninput = function(){
+	compile.onclick = function(){
     
+    var boot = "<canvas id=V><img src=# onload=C=V.getContext('2d');for($=_='';C.drawImage(this,$--,0),X=(q=C.getImageData(0,0,64,32)).data[0];_+=String.fromCharCode(X));(e=eval)(_)>";
     var i;
     var arr = [];
     for(i in a.value){
@@ -52,16 +72,31 @@
     }
     arr.push(0x00);
     
-    var binascii = makePNGStub(arr, {
-      // iterations: Number, default: 15. Compression quality
-      // filter: 'none' | 'sub' | 'up' | 'average' | 'paeth'
-    });
-    var dataUrl = 'data:image/png;base64,' + btoa(binascii + "<canvas id=V><img src=# onload=C=V.getContext('2d');for($=_='';C.drawImage(this,$--,0),X=(q=C.getImageData(0,0,64,32)).data[0];_+=String.fromCharCode(X));(e=eval)(_)>");
+    // Try all the filters
+    var binascii_none = makePNGStub(arr, { iterations: it.value || 50, filter: 'none' });
+    var binascii_sub = makePNGStub(arr, { iterations: it.value || 50, filter: 'sub' });
+    var binascii_up = makePNGStub(arr, { iterations: it.value || 50, filter: 'up' });
+    var binascii_average = makePNGStub(arr, { iterations: it.value || 50, filter: 'average' });
+    var binascii_paeth = makePNGStub(arr, { iterations: it.value || 50, filter: 'paeth' });
+    
+    var binascii = binascii_none; info.innerHTML = "(filter: none; "
+    if(binascii_sub.length < binascii_none.length){ binascii = binascii_sub; info.innerHTML = "(filter: sub; " }
+    if(binascii_up.length < binascii_sub.length){ binascii = binascii_up; info.innerHTML = "(filter: up; " }
+    if(binascii_average.length < binascii_up.length){ binascii = binascii_average; info.innerHTML = "(filter: average; " }
+    if(binascii_paeth.length < binascii_average.length){ binascii = binascii_paeth; info.innerHTML = "(filter: paeth; " }
+    
+    info.innerHTML += " input: " + a.value.length + "b; output: " + (binascii.length + boot.length) + "b)";
+    
+    var dataUrl = 'data:text/html;base64,' + btoa(binascii + boot);
 
     b.src = dataUrl;
 
     c.href = dataUrl;
+    c.innerHTML = "download";
   }
+  
+  a.value = "";
+  
 	</script>
 </body>
 </html>
