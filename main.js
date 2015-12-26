@@ -60,6 +60,8 @@ function makePNGStub(data, options) {
 		binAsciiString += String.fromCharCode(compressedData[i]);
 	}
 
+	binAsciiString = closeProperly(binAsciiString);
+
 	return binAsciiString;
 }
 
@@ -117,4 +119,54 @@ function filterData(data, filterName) {
 	}
 
 	return output;
+}
+
+function closeProperly (s) {
+	var openRe = /(<[\/a-zA-Z][^\s>]*\s*)|(<!--)|(<\?)|(<\[CDATA\[)/g;
+	var reWhitespace = /\s+/;
+	var tail = '';
+	while (true) {
+		var match = openRe.exec(s); // Test for any opening constructions
+		if (!match) {
+			break; // We've finished parsing the string
+		}
+
+		if (match[1]) {
+			// Okay so we landed here just after the tagname
+			// and all the whitespaces after (if any)
+			var reAttrName = /\s*(?:(>)|[^\s>]+?(\s*=\s*)?)/g;
+			reAttrName.lastIndex = openRe.lastIndex;
+			while (true) {
+				var matchAttrName = reAttrName.exec(s);
+				if (!matchAttrName) {
+					// Neither attr name nor closing waka followed
+					tail = '>';
+					break;
+				}
+				openRe.lastIndex = reAttrName.lastIndex;
+
+				if (matchAttrName[1]) {
+					// Tag is closed
+					tail = '';
+					break;
+				}
+
+				if (matchAttrName[2]) {
+					// Attr name found and an equal sign after it
+					var reAttrValue = /("|'|`)(?:(?!\1)[^])*(\1)?|[^\s>]*/g;
+					reAttrValue.lastIndex = reAttrName.lastIndex;
+					var matchAttrValue = reAttrValue.exec(s);
+					// Sync back the RE states
+					reAttrName.lastIndex = reAttrValue.lastIndex;
+					if (matchAttrValue[1] && !matchAttrValue[2]) {
+						// Unclosed quote
+						tail = matchAttrValue[1] + '>';
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	return s + tail;
 }
