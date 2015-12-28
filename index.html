@@ -86,14 +86,8 @@
     if(binascii_paeth.length < binascii_average.length){ binascii = binascii_paeth; info.innerHTML = "(filter: paeth; " }
     
     info.innerHTML += " input: " + a.value.length + "b; output: " + (binascii.length + boot.length) + "b)";
-    
-    // If the PNG contains an unmatched opening tag ("<"), close it
-    var tagend = "";
-    if(binascii.match(/<[^<]*$/)) {
-      tagend = ">";
-    }
-    
-    var dataUrl = 'data:text/html;base64,' + btoa(binascii + tagend + boot);
+
+    var dataUrl = 'data:text/html;base64,' + btoa(binascii + boot);
 
     b.src = dataUrl;
 
