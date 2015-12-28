@@ -166,6 +166,24 @@ function closeProperly (s) {
 				}
 			}
 		}
+
+		if (match[2] || match[3] || match[4]) {
+			// Unclosed <!--, <? or <![CDATA[
+			if (match[2]) {
+				tail = '-->';
+			} else if (match[3]) {
+				tail = '>';
+			} else if (match[4]) {
+				tail = ']]>';
+			}
+			// Check if it is closed somewhere
+			var index = s.indexOf(tail, openRe.lastIndex);
+			if (index !== -1) {
+				// It is. Fast-forwarding the main RE to that place
+				openRe.lastIndex = index + tail.length;
+				tail = '';
+			}
+		}
 	}
 
 	return s + tail;

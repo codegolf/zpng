@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<script src="main.js"></script>
+	<script>
+		console.assert(closeProperly('Oh, hi!') === 'Oh, hi!', 'Should not append anything if no < is encountered');
+		console.assert(closeProperly('Oh, hi *** <3 ***') === 'Oh, hi *** <3 ***', 'Should not append anything if no <(something) is not a valid tag start');
+		console.assert(closeProperly('Oh, hi<') === 'Oh, hi<', 'Should not append anything if no < is followed by the end of the string');
+		console.assert(closeProperly('Oh, hi<b') === 'Oh, hi<b>', 'Should append > on unclosed tags');
+		console.assert(closeProperly('Oh, hi<b ') === 'Oh, hi<b >', 'Should append > on unclosed tags with whitespace');
+		console.assert(closeProperly('Oh, hi<b woo') === 'Oh, hi<b woo>', 'Should append > on unclosed tags with value-less attrs');
+		console.assert(closeProperly('Oh, hi<b woo=') === 'Oh, hi<b woo=>', 'Should append > on unclosed tags with attrs with empty value');
+		console.assert(closeProperly('Oh, hi<b =') === 'Oh, hi<b =>', 'Special case: = as an attrname');
+		console.assert(closeProperly('Oh, hi<b ==3') === 'Oh, hi<b ==3>', 'Special case: = as an attrname with value');
+		console.assert(closeProperly('Oh, hi<b t="z') === 'Oh, hi<b t="z">', 'Should close atrr double quotes');
+		console.assert(closeProperly('Oh, hi<b t=\'z') === 'Oh, hi<b t=\'z\'>', 'Should close atrr single quotes');
+		console.assert(closeProperly('Oh, hi<b t=`z') === 'Oh, hi<b t=`z`>', 'Should close atrr backtick quotes (IE only)');
+
+		console.assert(closeProperly('Oh, hi<b t="z">!') === 'Oh, hi<b t="z">!', 'Should not append anything after properly closed tags');
+		console.assert(closeProperly('Oh, hi<b t="z"y>') === 'Oh, hi<b t="z"y>', 'Whitespace is not required after quote');
+
+		console.assert(closeProperly('Oh, <!-- hi') === 'Oh, <!-- hi-->', 'Should close unclosed comments');
+		console.assert(closeProperly('Oh, <!-- hi --> hello') === 'Oh, <!-- hi --> hello', 'Should not close closed comments');
+
+		console.assert(closeProperly('Oh, <?hi') === 'Oh, <?hi>', 'Should close unclosed PIs');
+		console.assert(closeProperly('Oh, <?hi> hello') === 'Oh, <?hi> hello', 'Should not close closed PIs');
+
+		console.assert(closeProperly('Oh, <[CDATA[ hi') === 'Oh, <[CDATA[ hi]]>', 'Should close unclosed CDATAs');
+		console.assert(closeProperly('Oh, <[CDATA[ hi]]> hello') === 'Oh, <[CDATA[ hi]]> hello', 'Should not close closed CDATAs');
+
+		// More comprex tests
+
+		console.assert(closeProperly('Oh, <b>Hi!<b') === 'Oh, <b>Hi!<b>', 'Tags should not interfere');
+		console.assert(closeProperly('Oh, <!-- <b Hi=" -->') === 'Oh, <!-- <b Hi=" -->', 'Tags and comments should not interfere');
+	</script>
+</body>
+</html>
