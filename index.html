@@ -73,11 +73,11 @@
     arr.push(0x00);
     
     // Try all the filters
-    var binascii_none = makePNGStub(arr, { iterations: it.value || 50, filter: 'none' });
-    var binascii_sub = makePNGStub(arr, { iterations: it.value || 50, filter: 'sub' });
-    var binascii_up = makePNGStub(arr, { iterations: it.value || 50, filter: 'up' });
-    var binascii_average = makePNGStub(arr, { iterations: it.value || 50, filter: 'average' });
-    var binascii_paeth = makePNGStub(arr, { iterations: it.value || 50, filter: 'paeth' });
+    var binascii_none = generatePNG(arr, boot, { iterations: it.value || 50, filter: 'none' });
+    var binascii_sub = generatePNG(arr, boot, { iterations: it.value || 50, filter: 'sub' });
+    var binascii_up = generatePNG(arr, boot, { iterations: it.value || 50, filter: 'up' });
+    var binascii_average = generatePNG(arr, boot, { iterations: it.value || 50, filter: 'average' });
+    var binascii_paeth = generatePNG(arr, boot, { iterations: it.value || 50, filter: 'paeth' });
     
     var binascii = binascii_none; info.innerHTML = "(filter: none; "
     if(binascii_sub.length < binascii_none.length){ binascii = binascii_sub; info.innerHTML = "(filter: sub; " }
@@ -87,7 +87,7 @@
     
     info.innerHTML += " input: " + a.value.length + "b; output: " + (binascii.length + boot.length) + "b)";
 
-    var dataUrl = 'data:text/html;base64,' + btoa(binascii + boot);
+    var dataUrl = 'data:text/html;base64,' + btoa(binascii);
 
     b.src = dataUrl;
 

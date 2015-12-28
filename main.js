@@ -122,6 +122,10 @@ function filterData(data, filterName) {
 }
 
 function closeProperly (s) {
+	return s + closeProperlyTail(s);
+}
+
+function closeProperlyTail (s) {
 	var openRe = /(<[\/a-zA-Z][^\s>]*\s*)|(<!--)|(<\?)|(<\[CDATA\[)/g;
 	var reWhitespace = /\s+/;
 	var tail = '';
@@ -186,5 +190,49 @@ function closeProperly (s) {
 		}
 	}
 
-	return s + tail;
+	return tail;
+}
+
+function _intersectStrs (leader, trailer) {
+	// Check if png data and bootstrap intersects.
+	// So if png data is "...<s" and bootstrap is "<script...",
+	// we use "...<script>..." instead of "...<s><script>..."
+
+	// Returns array of chopped trailers, ordered from best to worst
+	// excluding (!) the case where there is no intersection at all
+
+	var candidates = [];
+	for (var backoff = Math.min(leader.length, trailer.length); backoff > 0; backoff--){
+		if (leader.charCodeAt(leader.length - backoff) !== trailer.charCodeAt(0)) {
+			// Cheap check
+			continue;
+		}
+		if (leader.slice(leader.length - backoff) !== trailer.slice(0, backoff)) {
+			// Precise check
+			continue;
+		}
+		candidates.push(leader.slice(0, leader.length - backoff));
+	}
+
+	return candidates;
+}
+
+function generatePNG (data, bootstrap, options) {
+	// A PNG stream
+	var binascii = makePNGStub(data, options);
+
+	// Try to intersect strings
+	var trailerCandidates = _intersectStrs(binascii, bootstrap);
+	for (var i=0; i < trailerCandidates.length; i++){
+		if (closeProperlyTail(trailerCandidates[i])) {
+			// Whoops. We can't insert tail into the middle of the PNG data
+			continue;
+		}
+
+		console.log('We\'re lucky!');
+		// We're lucky!
+		return trailerCandidates[i] + bootstrap;
+	}
+
+	return binascii + closeProperlyTail(binascii) + bootstrap;
 }
